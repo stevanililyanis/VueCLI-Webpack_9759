@@ -4,10 +4,10 @@
             <v-list-item>
                 <v-list-item-content>
                     <v-list-item-title class="title">
-                        Nama Kalian
+                        Stevani Lilyani Saputri
                     </v-list-item-title>
                     <v-list-item-subtitle>
-                        NPM
+                        180709759
                     </v-list-item-subtitle>
                 </v-list-item-content>
             </v-list-item>
