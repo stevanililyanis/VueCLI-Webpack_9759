@@ -13,21 +13,32 @@
             </v-text-field>
        
         <v-spacer></v-spacer>
-        <v-select
-        v-model="sortable"
-        :items="['Penting', 'Biasa', 'Tidak penting']"
-        label="Sort Data"
-        style="width: 30%;"
-        >
-         </v-select>
+        
+         <v-select
+                    :items="['All Priority','Penting', 'Biasa', 'Tidak penting']"
+                    v-model="filters"
+                    label="Priority"
+                    @change="filterPriority"
+                    outlined
+                    hide-details
+                    class="mr-3"
+                    dense></v-select>
 
         <v-btn color="success" dark @click="dialog = true">
         Tambah
         </v-btn>
         </v-card-title>
-        <v-data-table :headers="headers" :items="todos" :search="search" :expanded.sync="expanded"
-        item-key="note"
-        show-expand>
+        <v-data-table :headers="headers" :items="todos" :search="search"
+        :single-expand="singleExpand"
+            :expanded.sync="expanded"
+            item-key="note"
+            show-expand
+            class="elevation-1">
+        <template v-slot:expanded-item="{ item }">
+            <h3>Note :</h3>
+            {{ item.note }}                        
+            </template>
+        
             <template v-slot:[`item.priority`]="{ item }">
                 <td>
                     <v-chip v-if="item.priority == 'Penting'" class="ma-2" close color="red"label outlined>
@@ -52,11 +63,11 @@
                 </v-btn>
             </template>
 
-             <template v-slot:[`expanded-item`]="{ item }">
-                    <td :colspan="headers.length">
-                        {{ item.note }}
-                    </td>
-                </template>
+            <template v-slot:[`expanded-item`]="{ item }">
+                <td :colspan="headers.length">
+                    {{ item.note }}
+                </td>
+            </template>
         </v-data-table>
     </v-card>
     <v-dialog v-model="dialog" persistent max-width="600px">
@@ -184,7 +195,8 @@ export default {
         edit:false,
         tempItem:null,
         dialogDelete:false,
-        singleExpand: true,
+        singleExpandable: false,
+        expanded:[],
         headers: [
                 {
                     text: "Task",
@@ -195,6 +207,7 @@ export default {
                 { text: "Priority", value: "priority" },
                 { text: "Note", value: "note" },
                 { text: "Actions", value: "actions" },
+                
             ],
         todos: [
                 {
@@ -226,6 +239,7 @@ export default {
         };
     },
     methods: {
+        
         save() {
             this.todos.push(this.formTodo);
             this.resetForm();
