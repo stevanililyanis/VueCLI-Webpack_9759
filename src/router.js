@@ -28,13 +28,18 @@ const router = new VueRouter({
             component: importComponent('TodoList/List'),
             },
             //UGD
-            {
+                {
                 path: "/ugd",
                 name: "Unguided",
                 component: importComponent('TodoList/ListUGD'),
                 },
+
+              
              ]
-        },
+            },
+            
+             
+            
              ]
 });
 export default router;

@@ -15,10 +15,10 @@
         <v-spacer></v-spacer>
         
          <v-select
-                    :items="['All Priority','Penting', 'Biasa', 'Tidak penting']"
-                    v-model="filters"
+                    :items="['Penting', 'Tidak penting']"
+                    v-model="sort"
                     label="Priority"
-                    @change="filterPriority"
+                    @change="sortPriority(sort)"
                     outlined
                     hide-details
                     class="mr-3"
@@ -63,11 +63,7 @@
                 </v-btn>
             </template>
 
-            <template v-slot:[`expanded-item`]="{ item }">
-                <td :colspan="headers.length">
-                    {{ item.note }}
-                </td>
-            </template>
+            
         </v-data-table>
     </v-card>
     <v-dialog v-model="dialog" persistent max-width="600px">
@@ -190,13 +186,14 @@ export default {
     name: "List",
     data() {
         return {
+        expanded:[],
         search: null,
         dialog: false,
         edit:false,
         tempItem:null,
         dialogDelete:false,
-        singleExpandable: false,
-        expanded:[],
+        singleExpand: false,
+        sort:"unsort",
         headers: [
                 {
                     text: "Task",
@@ -280,6 +277,32 @@ export default {
         confirmDelete(){
             this.todos.splice(this.tempItem, 1)
             this.dialogDelete=false;
+        },
+        sortPriority: function(sort){
+            function sorting(itemA, itemB){
+                if(sort=="Tidak penting"){
+                    if (itemA.priority=="Penting")
+                            return 1;                     
+                        if (itemA.priority=="Tidak Penting")
+                            return -1;                                           
+                        if (itemA.priority=="Biasa" && itemB.priority=="Tidak penting")
+                            return 1;                       
+                        if (itemA.priority=="Biasa" && itemB.priority=="Penting")
+                            return 0; 
+                
+                    }
+                    if(sort == "Penting"){
+                        if (itemA.priority=="Tidak Penting")
+                            return 1;
+                        if (itemA.priority=="Penting")
+                            return -1;                                      
+                        if (itemA.priority=="Biasa" && itemB.priority=="Penting")
+                            return 1;                       
+                        if (itemA.priority=="Biasa" && itemB.priority=="Tidak penting")
+                            return 0;
+                      }  
+                 }
+                 return this.todos.sort(sorting);  
         }
     },
 };
