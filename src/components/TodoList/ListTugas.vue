@@ -28,16 +28,22 @@
            Tambah
            </v-btn>
            </v-card-title>
-           <v-data-table :headers="headers" :items="todos" :search="search"
-           :single-expand="singleExpand"
+           <v-data-table 
+        
+             :headers="headers" :items="todos" :search="search"
+               :single-expand="singleExpand"
                :expanded.sync="expanded"
                item-key="note"
                show-expand
                class="elevation-1">
-           <template v-slot:expanded-item="{ item }">
-               <h3>Note :</h3>
-               {{ item.note }}                        
-               </template>
+
+           
+               <template v-slot:expanded-item="{item }">
+                <td :colspan="headers.length">
+                  Note:
+                  {{ item.note}}
+                </td>
+              </template>
                
                <template v-slot:[`item.priority`]="{ item }">
                    <td>
@@ -54,19 +60,44 @@
                </template>
               
    
-               <template v-slot:[`item.actions`]="{ item }">
-                   <v-btn small class="mr-2" @click="editItem(item)">
-                       edit
-                   </v-btn>
-                   <v-btn small @click="deleteItem(item)">
-                   delete
-                   </v-btn>
-               </template>
-   
+            <template v-slot:[`item.actions`]="{item}">
+                <v-btn icon small class="mr-2" @click="editItem(item)">
+                  <v-icon color="indigo">mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn icon small @click="deleteItem(item)">
+                     <v-icon color="red">mdi-delete</v-icon>
+                </v-btn>
+            </template>
+            
+          
+            <template v-slot:[`item.checked`]="{item}">
+            
+                <v-checkbox v-bind:value="item" v-model="checked" @click="checkedItem()"></v-checkbox>
                
+              </template>
+              
            </v-data-table>
        </v-card>
+
+
+       
+       <v-card v-show="deleteCard" style="margin-top: 20px; padding: 20px;">
+        
+        <p>Delete Multiple:</p>
+        <v-list-item v-for="(item, i) in checked" :key="i">
+            <v-list-item-content>
+                <v-list-item-title> • {{checked[i].task}}</v-list-item-title>
+            </v-list-item-content>
+    
+        </v-list-item>
+        <v-btn color="error ml-4 mt-5 mr-5 " dark @click="delChecked">
+            Hapus Semua
+        </v-btn>
+        </v-card>
+
        <v-dialog v-model="dialog" persistent max-width="600px">
+
+
        <v-card>
            <v-card-title>
            <span class="headline">Form Todo</span>
@@ -104,7 +135,10 @@
         </v-card-actions>
        </v-card>
        </v-dialog>
-   
+
+       
+       
+
        <v-dialog v-model="edit" persistent max-width="400px">
            <v-card>
                <v-card-title>
@@ -187,12 +221,14 @@
        data() {
            return {
            expanded:[],
+           checked:[],
            search: null,
            dialog: false,
            edit:false,
            tempItem:null,
            dialogDelete:false,
            singleExpand: false,
+           deleteCard:false,
            sort:"unsort",
            headers: [
                    {
@@ -204,6 +240,7 @@
                    { text: "Priority", value: "priority" },
                    { text: "Note", value: "note" },
                    { text: "Actions", value: "actions" },
+                   { text: "",value:"checked"},
                    
                ],
            todos: [
@@ -233,6 +270,9 @@
                    priority: null,
                    note: null,
                },
+               checked:[
+                    
+               ],
            };
        },
        methods: {
@@ -274,6 +314,23 @@
                this.tempItem=item;
                this.dialogDelete=true; 
            },
+           checkedItem(){
+               if(this.checked.length>0){
+                   this.deleteCard=true;
+               }else
+               {
+                    this.deleteCard=false;
+                }
+ 
+           },
+           delChecked:function(){
+                for(var i = 0; i < this.checked.length; i++){            
+                    this.todos.splice( this.todos.indexOf(this.checked[i]), 1);
+                }
+                this.checked=[];  
+                this.deleteCard=false;
+           }
+           ,
            confirmDelete(){
                this.todos.splice(this.tempItem, 1)
                this.dialogDelete=false;
